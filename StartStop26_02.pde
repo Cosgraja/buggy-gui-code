@@ -7,8 +7,10 @@ ControlP5 cp5;
 boolean isRunning = false;
 float velocity = 0.0;
 float maxVelocity = 10.0; // Maximum velocity of the buggy
+float distance_traveled = 0;
 String IP = "192.168.4.1";
 int PORT = 80;
+JSONObject json;
 
 Client myClient = new Client(this,IP,PORT);
 
@@ -24,19 +26,17 @@ void stopBuggy() {
 boolean obstacle_detected = false;
 
 void pingBuggy() {
-  int update = -1;
+  json = new JSONObject();
+
   myClient.write("ping\n");
-  update = myClient.read();
-  switch(update) {
-    case 1:
-      obstacle_detected = true;
-      break;
-    case 0:
-      obstacle_detected = false;
-      break;
-    default:
-      println("WiFi's screwed!!!");
+  json = parseJSONObject(myClient.readString());
+  if(json == null) {
+    println("WiFi's Screwed!!");
+    return;
   }
+  println(json);
+  obstacle_detected = json.getBoolean("obstacle_detected");
+  distance_traveled = json.getFloat("distance_traveled");
   //println(update);
 }
 
@@ -80,9 +80,10 @@ void draw() {
   // Display the current state of the buggy
   fill(255);
   textSize(30);
-  text("Buggy is " + (isRunning ? "Running" : "Stopped"), 50, 250);
-  text("Buggy " + (obstacle_detected ? "sees an obstacle!" : "does not see an obstacle in its path"), 50, 300);
+  text("Buggy is " + (isRunning ? "Running" : "Stopped") + ".", 50, 250);
+  text("Buggy " + (obstacle_detected ? "sees an obstacle!" : "does not see an obstacle in its path") +".",50, 300);
   //text("Velocity: " + velocity, 50, 180);
+  text("Buggy has travelled " + distance_traveled+" cm"+".", 50,350);
   if(frameCount % 60 == 0) {
     pingBuggy();
   }
