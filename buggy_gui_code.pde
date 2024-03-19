@@ -36,7 +36,7 @@ void setSpeed(float ref_speed){
   myClient.write(json.toString());
 }
 
-//int currentUpdate = ;
+
 boolean obstacle_detected = false;
 
 void pingBuggy() {
@@ -56,6 +56,8 @@ void pingBuggy() {
   distance_from_object = json.getFloat("distance_from_object");
   measured_speed = json.getFloat("measured_speed");
   //println(update);
+
+updateKnobValue()
 }
 
 PFont tnrFont;
@@ -105,7 +107,6 @@ void setup() {
       .snapToTickMarks(true)
       .setColorForeground(color(0,255,0))
       .setColorActive(color(0,255,0));
-    //  .setDragDirection(Knob.HORIZONTAL);
      
 }
 
@@ -122,17 +123,9 @@ void draw() {
   if(frameCount % 60 == 0) {
     pingBuggy();
   }
-  //text(ref_speed, 50,400);
- // textSize(20);
-  //text("Group X12", 900, 25);
-
 
 }
 
-/*void setVelocity(float ref_speed) {
-  // Update the value of the knob when the slider value changes
-  knob.setValue(ref_speed);
-}*/
 
 void updateKnobValue() {
   // Update the value of the knob based on measured_speed
