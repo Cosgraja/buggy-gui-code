@@ -30,6 +30,7 @@ float maxVelocity = 10; // units in m/s,max val can be changed
 float measured_speed = 0; // speed for gauge
 float distance_traveled = 0;
 float distance_from_object = 0;
+float tag_mode = 2;
 String IP = "192.168.4.1";
 int PORT = 80;
 JSONObject json;
@@ -48,7 +49,7 @@ void setup() {
   
   minim= new Minim(this);
   
-  go_sound = minim.loadFile("meme-okay-lets-go.mp3");
+  go_sound = minim.loadFile("mk64_racestart.mp3");
   stop_sound = minim.loadFile("erro-2.mp3");
   left_sound = minim.loadFile("turnleft.mp3");
   right_sound = minim.loadFile("turnright.mp3");
@@ -136,10 +137,28 @@ cp5.addButton("Manual Override")
 void draw() {
   background(0);
   
-   if (stop_sign != null) {
-    //image(stop_sign, 800, 0);
-    image(right_sign, 1100,100);
-    //right_sound.play();
+  if  (frameCount % 180 == 0){
+  tag_mode++;
+  if (tag_mode > 4){
+  tag_mode =1;
+  }
+  }
+  
+   if (tag_mode ==  1){
+    image(go_sign, 1100,100);
+    go_sound.play();
+   }
+   else if (tag_mode == 2){
+     image(stop_sign,1100,100);
+     stop_sound.play();
+   }
+   else if (tag_mode == 3){
+     image(left_sign,1100,100);
+     left_sound.play();
+   }
+   else if (tag_mode == 4){
+     image(right_sign,1100,100);
+     right_sound.play();
    }
    
    drawLegend();
