@@ -20,7 +20,7 @@ PImage stop_sign;
 PImage left_sign;
 PImage right_sign;
 int control_strategy = 1;
-int tag_recognised = 0;
+int tag_recognised = -1;
 boolean pidMode = false;
 boolean isRunning = false;
 boolean theValue = false;
@@ -66,6 +66,8 @@ void setup() {
     if (go_sign == null) {
     println("Failed to load image. Please check the file path.");
   }
+  
+  //tag(tag_recognised);
   
   tnrFont = createFont("Times New Roman",40);
   textFont(tnrFont);
@@ -137,37 +139,15 @@ cp5.addButton("Manual Override")
 void draw() {
   background(0);
   
-  if  (frameCount % 180 == 0){
-  tag_mode++;
-  if (tag_mode > 4){
-  tag_mode =1;
-  }
-  }
   
-   if (tag_mode ==  1){
-    image(go_sign, 1100,100);
-    go_sound.play();
-   }
-   else if (tag_mode == 2){
-     image(stop_sign,1100,100);
-     stop_sound.play();
-   }
-   else if (tag_mode == 3){
-     image(left_sign,1100,100);
-     left_sound.play();
-   }
-   else if (tag_mode == 4){
-     image(right_sign,1100,100);
-     right_sound.play();
-   }
-   
+
    drawLegend();
    
   // Display the current state of the buggy
   fill(255);
   textSize(25);
   text("Buggy is " + (isRunning ? "Running" : "Stopped") + ".", 50, 200);
-  text("Buggy " + (obstacle_detected ? "sees an obstacle! and it is " + distance_from_object + "cm from the object" : "does not see an obstacle in its path") +".",50, 250);
+  text("Buggy " + (obstacle_detected ? "sees an obstacle! and it is " + distance_from_object + "cm from the object" : "does not see an obstacle in its path") +".",50, 450);
   //text("Velocity: " + velocity, 50, 180);
   text("Buggy has travelled " + distance_traveled+" cm"+".", 50,300);
 
@@ -179,21 +159,18 @@ void draw() {
     text("Manual Override OFF", 50, 400);
   }
 
-  text("Current mode of control: " + control_strategy , 50 ,450);
+  text("Current mode of control: " + control_strategy , 50 ,250);
 
-  if(frameCount % 60 == 0) {
-    pingBuggy();
-      
-  }
- 
-  
-  
-      myChart.push("incoming", (3*sin(frameCount*0.5)));
        if(frameCount % 60 == 0) {
     pingBuggy();
          myChart.push("secondVariable", ref_speed);
-         println(ref_speed);
+         myChart.push("incoming", measured_speed);
+         //tag(tag_mode);
+        
   }
+  
+  tag(tag_recognised);
+
 
 }
 
@@ -216,6 +193,7 @@ void drawLegend() {
   rect(legendX , legendY + 20, legendWidth, legendHeight);
   fill(255); // Set text color to black
   text("Reference Speed", legendX + legendWidth + 5, legendY + legendHeight + 20); // Position the text right to the color box
+  
 }
 
 //////////////////////////////////
@@ -226,6 +204,32 @@ void drawLegend() {
   right_sound.play();
 }
 */
+
+void tag(float tag_mode){
+  
+  if (tag_mode == -1){
+    text ("no tag found", 1100, 100);
+  }
+  
+   if (tag_mode ==  1){
+    image(go_sign, 1100,100);
+    go_sound.play();
+   }
+   else if (tag_mode == 2){
+     image(stop_sign,1100,100);
+     stop_sound.play();
+   }
+   else if (tag_mode == 3){
+     image(left_sign,1100,100);
+     left_sound.play();
+   }
+   else if (tag_mode == 4){
+     image(right_sign,1100,100);
+     right_sound.play();
+   }
+   
+}
+
 void startBuggy() {
   json = new JSONObject();
   json.setString("command", "start");
@@ -273,7 +277,7 @@ void pingBuggy() {
   control_strategy = json.getInt("control_strategy");
   tag_recognised = json.getInt("tag_recognised");
   
-  
+  tag(tag_recognised);
   myChart.push("incoming", measured_speed);
 }
 
