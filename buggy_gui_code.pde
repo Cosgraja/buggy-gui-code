@@ -1,4 +1,3 @@
-import processing.net.*;
 import controlP5.*;
 import processing.net.*;
 import ddf.minim.*;
@@ -11,14 +10,16 @@ Slider velocitySlider;
 Chart myChart;
 Toggle toggle;
 AudioPlayer go_sound;
-AudioPlayer stop_sound;
+AudioPlayer slow_sound;
 AudioPlayer left_sound;
 AudioPlayer right_sound;
+AudioPlayer chacha;
 
 PImage go_sign;
-PImage stop_sign;
+PImage slow_sign;
 PImage left_sign;
 PImage right_sign;
+PImage dance;
 int control_strategy = 1;
 int tag_recognised = -1;
 boolean pidMode = false;
@@ -50,16 +51,18 @@ void setup() {
   minim= new Minim(this);
   
   go_sound = minim.loadFile("mk64_racestart.mp3");
-  stop_sound = minim.loadFile("erro-2.mp3");
+  slow_sound = minim.loadFile("hey-hey-slow-down.mp3");
   left_sound = minim.loadFile("turnleft.mp3");
   right_sound = minim.loadFile("turnright.mp3");
+  chacha = minim.loadFile("CHA-CHA-SLIDE.mp3");
  
   go_sign = loadImage("GO_SIGN.jpg");
-  stop_sign = loadImage("STOP_SIGN.jpg");
+  slow_sign = loadImage("SLOW_SIGN.jpg");
   left_sign = loadImage("LEFT_SIGN.jpg");
   right_sign = loadImage("RIGHT_SIGN.jpg");
+  dance = loadImage("dance.jpeg");
   
-    if (stop_sign == null) {
+    if (slow_sign == null) {
     println("Failed to load image. Please check the file path.");
   }
   
@@ -169,6 +172,8 @@ void draw() {
         
   }
   
+  drawChartAxesWithTicks(575, 175, 400, 300, maxVelocity);
+  
   tag(tag_recognised);
 
 
@@ -196,37 +201,67 @@ void drawLegend() {
   
 }
 
+void drawChartAxesWithTicks(int chartX, int chartY, int chartWidth, int chartHeight, float maxValue) {
+  stroke(255);
+  int numTicks = 10;  // Number of ticks on the y-axis
+  float tickSpacing = chartHeight / (float)numTicks;
+  float valueSpacing = maxValue / (float)numTicks;
+
+  // Draw y-axis
+  line(chartX, chartY, chartX, chartY + chartHeight);
+
+  // Draw x-axis
+  line(chartX, chartY + chartHeight, chartX + chartWidth, chartY + chartHeight);
+
+  // Draw ticks and labels on the y-axis
+  for (int i = 0; i <= numTicks; i++) {
+    float tickY = chartY + chartHeight - i * tickSpacing;
+    line(chartX - 5, tickY, chartX, tickY);  // Draw tick
+    fill(255);
+    textSize(12);
+    text(nf(i * valueSpacing, 0, 2), chartX - 40, tickY + 5);  // Draw tick label
+  }
+}
+
 //////////////////////////////////
   // Functions For Networking//
 /////////////////////////////////
 
-/*void mousePressed() {
-  right_sound.play();
-}
-*/
 
 void tag(float tag_mode){
   
   if (tag_mode == -1){
+    textSize(25);
     text ("no tag found", 1100, 100);
   }
   
-   if (tag_mode ==  1){
+   if (tag_mode ==  3){
     image(go_sign, 1100,100);
+
     go_sound.play();
    }
-   else if (tag_mode == 2){
-     image(stop_sign,1100,100);
-     stop_sound.play();
+   else if (tag_mode == 4){
+    image(slow_sign,1100,100);
+     
+    slow_sound.play();
    }
-   else if (tag_mode == 3){
+   else if (tag_mode == 1){
      image(left_sign,1100,100);
+     
      left_sound.play();
    }
-   else if (tag_mode == 4){
+   else if (tag_mode == 2){
      image(right_sign,1100,100);
+     
      right_sound.play();
    }
+   
+      else if (tag_mode == 5){
+     image(dance,1000,100);
+     
+     chacha.play();
+   }
+   
    
 }
 
@@ -273,7 +308,9 @@ void pingBuggy() {
   obstacle_detected = json.getBoolean("obstacle_detected");
   distance_traveled = json.getFloat("distance_traveled");
   distance_from_object = json.getFloat("distance_from_object");
+  distance_from_object = distance_from_object*0.73;
   measured_speed = json.getFloat("measured_speed");
+  measured_speed = measured_speed * 0.031;
   control_strategy = json.getInt("control_strategy");
   tag_recognised = json.getInt("tag_recognised");
   
