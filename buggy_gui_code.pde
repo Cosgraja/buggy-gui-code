@@ -27,8 +27,8 @@ boolean isRunning = false;
 boolean theValue = false;
 boolean obstacle_detected = true;
 float ref_speed = 0; // units in m/s, speed sent to arduino
-float maxVelocity = 10; // units in m/s,max val can be changed
-float measured_speed = 0; // speed for gauge
+float maxVelocity = 3; // units in m/s
+float measured_speed = 0; // speed from arduino
 float distance_traveled = 0;
 float distance_from_object = 0;
 float tag_mode = 2;
@@ -232,12 +232,12 @@ void tag(float tag_mode){
     text ("no tag found", 1100, 100);
   }
   
-   if (tag_mode ==  3){
+   if (tag_mode ==  4){
     image(go_sign, 1100,100);
 
     go_sound.play();
    }
-   else if (tag_mode == 4){
+   else if (tag_mode == 3){
     image(slow_sign,1100,100);
      
     slow_sound.play();
@@ -304,10 +304,11 @@ void pingBuggy() {
   println(json);
   obstacle_detected = json.getBoolean("obstacle_detected");
   distance_traveled = json.getFloat("distance_traveled");
-  distance_from_object = json.getFloat("distance_from_object");
-  distance_from_object = distance_from_object*0.73;
+   distance_traveled = distance_traveled * 0.5;
+  distance_from_object = json.getFloat("distance_from_object"); 
+  
   measured_speed = json.getFloat("measured_speed");
-  measured_speed = measured_speed * 0.031;
+measured_speed = measured_speed * 6;
   control_strategy = json.getInt("control_strategy");
   tag_recognised = json.getInt("tag_recognised");
   
