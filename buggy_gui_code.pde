@@ -25,7 +25,7 @@ int tag_recognised = -1;
 boolean pidMode = false;
 boolean isRunning = false;
 boolean theValue = false;
-boolean obstacle_detected = false;
+boolean obstacle_detected = true;
 float ref_speed = 0; // units in m/s, speed sent to arduino
 float maxVelocity = 10; // units in m/s,max val can be changed
 float measured_speed = 0; // speed for gauge
@@ -94,7 +94,7 @@ void setup() {
   
   // Velocity Slider
   velocitySlider = cp5.addSlider("Speed")
-     .setPosition(50, 500)
+     .setPosition(50, 525)
      .setSize(325, 60)
      .setFont(createFont("Times New Roman",20))
      .setRange(0, maxVelocity) // Set the range of the slider
@@ -150,10 +150,9 @@ void draw() {
   fill(255);
   textSize(25);
   text("Buggy is " + (isRunning ? "Running" : "Stopped") + ".", 50, 200);
-  text("Buggy " + (obstacle_detected ? "sees an obstacle! and it is " + distance_from_object + "cm from the object" : "does not see an obstacle in its path") +".",50, 450);
-  //text("Velocity: " + velocity, 50, 180);
+  text("Buggy " + (obstacle_detected ? "sees an obstacle! and it is ": "does not see an obstacle in its path"),50, 450);
+  text(obstacle_detected ?  distance_from_object + "cm from the object" : "", 50, 500);
   text("Buggy has travelled " + distance_traveled+" cm"+".", 50,300);
-
   text("Buggy has a measured speed of  " + measured_speed+" m/s"+".", 50,350);
 
   if (pidMode) {
@@ -181,45 +180,43 @@ void draw() {
 
 
 void drawLegend() {
-  int legendX = 575 ; // Starting x position of the legend (aligned with the chart)
-  int legendY = 300 + 175 + 20; // Starting y position, placed 20 pixels below the chart
-  int legendWidth = 20; // Width of the legend color boxes
-  int legendHeight = 10; // Height of the legend color boxes
-  int spacing = 40; // Spacing between legend items
+  int legendX = 575 ; 
+  int legendY = 300 + 175 + 20; 
+  int legendWidth = 20; 
+  int legendHeight = 10; 
   
-  // Draw the legend for the "incoming" dataset
+  
   fill(255, 0, 0); // Red color for the first variable
   rect(legendX, legendY, legendWidth, legendHeight);
-  fill(255); // Set text color to black
-  text("Measured Speed", legendX + legendWidth + 5, legendY + legendHeight); // Position the text right to the color box
+  fill(255); 
+  text("Measured Speed", legendX + legendWidth + 5, legendY + legendHeight); 
 
-  // Draw the legend for the "secondVariable" dataset
+  
   fill(255, 255, 0); // Yellow color for the second variable
   rect(legendX , legendY + 20, legendWidth, legendHeight);
-  fill(255); // Set text color to black
-  text("Reference Speed", legendX + legendWidth + 5, legendY + legendHeight + 20); // Position the text right to the color box
+  fill(255); 
+  text("Reference Speed", legendX + legendWidth + 5, legendY + legendHeight + 20); 
   
 }
 
 void drawChartAxesWithTicks(int chartX, int chartY, int chartWidth, int chartHeight, float maxValue) {
   stroke(255);
-  int numTicks = 10;  // Number of ticks on the y-axis
+  float numTicks = maxVelocity; 
   float tickSpacing = chartHeight / (float)numTicks;
   float valueSpacing = maxValue / (float)numTicks;
 
-  // Draw y-axis
+  // Y-axis
   line(chartX, chartY, chartX, chartY + chartHeight);
 
-  // Draw x-axis
+  // X-axis
   line(chartX, chartY + chartHeight, chartX + chartWidth, chartY + chartHeight);
 
-  // Draw ticks and labels on the y-axis
   for (int i = 0; i <= numTicks; i++) {
     float tickY = chartY + chartHeight - i * tickSpacing;
-    line(chartX - 5, tickY, chartX, tickY);  // Draw tick
+    line(chartX - 5, tickY, chartX, tickY);  
     fill(255);
     textSize(12);
-    text(nf(i * valueSpacing, 0, 2), chartX - 40, tickY + 5);  // Draw tick label
+    text(nf(i * valueSpacing, 0, 2), chartX - 40, tickY + 5);
   }
 }
 
